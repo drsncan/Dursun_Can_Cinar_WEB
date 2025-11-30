@@ -1,0 +1,110 @@
+############################
+# Visual Studio Genel Ayarlar
+############################
+.vs/
+*.user
+*.suo
+*.cache
+*.log
+*.sln.docstates
+*.pdb
+
+############################
+# Build Çýktýlarý
+############################
+bin/
+obj/
+out/
+debug/
+release/
+
+############################
+# Paketler
+############################
+packages/
+*.nupkg
+*.snk
+
+############################
+# Rider, VSCode
+############################
+.idea/
+*.ipr
+*.iws
+*.iml
+.vscode/
+
+############################
+# ASP.NET Core
+############################
+wwwroot/lib/
+wwwroot/node_modules/
+node_modules/
+
+############################
+# Yayýn (Publish) Klasörleri
+############################
+publish/
+dist/
+artifacts/
+
+############################
+# Kullanýcý Profili Dosyalarý
+############################
+*.dbmdl
+*.jfm
+
+############################
+# Loglar / Temp
+############################
+*.log
+*.tmp
+*.temp
+
+############################
+# OS Dosyalarý
+############################
+Thumbs.db
+ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+.DS_Store?
+._*
+.Trashes
+Icon?
+
+############################
+# Cache Dosyalarý
+############################
+*.cache
+*.config.user
+*.vspscc
+*.vssscc
+*.ncrunchsolution
+*.ncrunch*
+
+############################
+# SQL / LocalDB
+############################
+*.mdf
+*.ldf
+*.db
+
+############################
+# Doküman Yönetim Sistemi Kiþisel Dosyalarý
+############################
+DmsWeb/wwwroot/uploads/
+DmsWeb/wwwroot/files/
+
+############################
+# Yayýnlanan Settings Dosyalarý
+############################
+appsettings.Development.json
+appsettings.Local.json
+
+############################
+# Rider DotNet Tools
+############################
+.idea/
+*.DotSettings.user
