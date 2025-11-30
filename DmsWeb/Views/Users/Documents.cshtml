@@ -1,0 +1,77 @@
+﻿@model DmsWeb.Models.UserDocumentsViewModel
+
+@{
+    ViewData["Title"] = "Kullanıcı Belgeleri";
+    ViewBag.ActiveMenu = "Users";
+}
+
+@section PageHeader {
+    <div class="row mb-2">
+        <div class="col-sm-8">
+            <h1 class="page-title">
+                <i class="fa-solid fa-folder-open mr-2"></i>
+                @Model.User.FullName (@Model.User.Username) – Belgeleri
+            </h1>
+        </div>
+        <div class="col-sm-4 text-right">
+            <a href="@Url.Action("Index", "Users")"
+               class="btn btn-sm btn-outline-secondary">
+                Kullanıcı listesine dön
+            </a>
+        </div>
+    </div>
+}
+
+<div class="dms-card">
+    @if (!Model.Documents.Any())
+    {
+        <div class="alert alert-info mb-0">
+            Bu kullanıcıya ait belge bulunmuyor.
+        </div>
+    }
+    else
+    {
+        <table class="table table-sm table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Belge No</th>
+                    <th>Başlık</th>
+                    <th>Durum</th>
+                    <th>Oluşturma Tarihi</th>
+                    <th>Dosya</th>
+                    <th style="width:130px;">İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var d in Model.Documents)
+                {
+                    <tr>
+                        <td>@d.Number</td>
+                        <td>@d.Title</td>
+                        <td>@d.Status</td>
+                        <td>@d.CreatedAt.ToString("dd.MM.yyyy")</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(d.StoredFileName))
+                            {
+                                <a href="@Url.Action("Download", "Documents", new { id = d.Id })"
+                                   class="btn btn-xs btn-outline-secondary">
+                                    İndir
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Yok</span>
+                            }
+                        </td>
+                        <td>
+                            <a href="@Url.Action("Details", "Documents", new { id = d.Id })"
+                               class="btn btn-xs btn-outline-primary">
+                                Detay
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

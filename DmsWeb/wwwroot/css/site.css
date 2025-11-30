@@ -1,0 +1,69 @@
+/* Belgeler tablosu için küçük dokunuþlar */
+
+.page-title {
+    font-size: 1.25rem;
+}
+
+.sort-indicator {
+    font-size: 0.7rem;
+    margin-left: 4px;
+}
+
+/* Durum rozetleri */
+
+.dms-status-badge-Taslak {
+    background-color: #6c757d; /* secondary */
+    color: #fff;
+}
+
+.dms-status-badge-OnayBekliyor {
+    background-color: #ffc107; /* warning */
+    color: #212529;
+}
+
+.dms-status-badge-Onaylandý {
+    background-color: #28a745; /* success */
+    color: #fff;
+}
+
+.dms-status-badge-Reddedildi {
+    background-color: #dc3545; /* danger */
+    color: #fff;
+}
+/* Login background */
+.login-bg {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #b3d9ff, #e6f2ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Login card styling */
+.login-card {
+    width: 100%;
+    max-width: 480px;
+    background: white;
+    padding: 30px 35px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+    /* Inputlar biraz daha modern görünsün */
+    .login-card input {
+        border-radius: 8px !important;
+    }
+
+    /* Login butonunu daha modern hale getirelim */
+    .login-card button {
+        border-radius: 8px;
+    }
+
+/* xs boyutta tablo daha rahat görünsün */
+@media (max-width: 576px) {
+    #documents-table td,
+    #documents-table th {
+        font-size: 0.8rem;
+        padding: .35rem .5rem;
+    }
+}

@@ -1,0 +1,101 @@
+﻿@model IEnumerable<DmsWeb.Models.AppUser>
+
+@{
+    ViewData["Title"] = "Kullanıcılar";
+    ViewBag.ActiveMenu = "Users";
+}
+
+@section PageHeader {
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1 class="page-title">
+                <i class="fa-solid fa-users mr-2"></i> Kullanıcılar
+            </h1>
+        </div>
+    </div>
+}
+
+<div class="dms-card">
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success">@TempData["Message"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <table class="table table-sm table-hover align-middle">
+        <thead>
+            <tr>
+                <th>Kullanıcı Adı</th>
+                <th>Ad Soyad</th>
+                <th>Rol</th>
+                <th>Durum</th>
+                <th style="width:260px;">İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var u in Model)
+            {
+                <tr class="@(u.IsActive ? "" : "table-secondary")">
+                    <td>@u.Username</td>
+                    <td>@u.FullName</td>
+                    <td>
+                        <span class="badge @(u.Role == "Admin" ? "badge-danger" : "badge-info")">
+                            @u.Role
+                        </span>
+                    </td>
+                    <td>
+                        @if (u.IsActive)
+                        {
+                            <span class="badge badge-success">Aktif</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-secondary">Pasif</span>
+                        }
+                    </td>
+                    <td>
+                        <a href="@Url.Action("Documents", "Users", new { id = u.Id })"
+                           class="btn btn-xs btn-outline-primary mr-1">
+                            Belgeleri
+                        </a>
+
+                        <form asp-action="ToggleRole"
+                              asp-route-id="@u.Id"
+                              method="post"
+                              class="d-inline">
+                            <button type="submit"
+                                    class="btn btn-xs btn-outline-warning">
+                                Rolü @(u.Role == "Admin" ? "User" : "Admin") yap
+                            </button>
+                        </form>
+
+                        <form asp-action="ToggleActive"
+                              asp-route-id="@u.Id"
+                              method="post"
+                              class="d-inline">
+                            <button type="submit"
+                                    class="btn btn-xs @(u.IsActive ? "btn-outline-secondary" : "btn-outline-success")">
+                                @(u.IsActive ? "Pasif Yap" : "Aktif Et")
+                            </button>
+                        </form>
+
+                        <form asp-action="Delete"
+                              asp-route-id="@u.Id"
+                              method="post"
+                              class="d-inline"
+                              onsubmit="return confirm('Bu kullanıcıyı silmek istediğine emin misin?');">
+                            <button type="submit"
+                                    class="btn btn-xs btn-outline-danger">
+                                Sil
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

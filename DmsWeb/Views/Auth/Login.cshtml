@@ -1,0 +1,49 @@
+@{
+    ViewData["Title"] = "Giriş Yap";
+    var returnUrl = ViewBag.ReturnUrl as string;
+}
+
+<div class="card shadow-sm">
+    <div class="card-header text-center">
+        <h4 class="mb-1">Döküman Yönetim Sistemi</h4>
+        <small class="text-muted">Hesabınla giriş yap</small>
+    </div>
+
+    <div class="card-body">
+        <form asp-action="Login" method="post">
+            @Html.AntiForgeryToken()
+            @if (!string.IsNullOrEmpty(returnUrl))
+            {
+                <input type="hidden" name="returnUrl" value="@returnUrl" />
+            }
+
+            <div class="form-group mb-2">
+                <label for="username">Kullanıcı Adı</label>
+                <input name="username"
+                       id="username"
+                       class="form-control"
+                       autocomplete="username" />
+            </div>
+
+            <div class="form-group mb-2">
+                <label for="password">Şifre</label>
+                <input name="password"
+                       id="password"
+                       class="form-control"
+                       type="password"
+                       autocomplete="current-password" />
+            </div>
+
+            <div asp-validation-summary="All" class="text-danger small mt-2"></div>
+
+            <button type="submit" class="btn btn-primary w-100 mt-3">
+                Giriş Yap
+            </button>
+        </form>
+    </div>
+
+    <div class="card-footer text-center">
+        <span class="small text-muted">Hesabın yok mu?</span>
+        <a asp-action="Register" class="small ml-1">Kayıt Ol</a>
+    </div>
+</div>

@@ -1,0 +1,174 @@
+@model DmsWeb.Models.Document
+
+@{
+    ViewData["Title"] = "Belge Detayı";
+    ViewBag.ActiveMenu = "Documents";
+}
+@section PageHeader {
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1 class="page-title">
+                <i class="fa-solid fa-file-lines mr-2"></i> Belge Detayı
+            </h1>
+        </div>
+        <div class="col-sm-6 text-right">
+            @if (User.IsInRole("Admin"))
+            {
+            <!-- SİL BUTONU (FORM İÇİNDE) -->
+            <form asp-action="Delete"
+                  method="post"
+                  class="d-inline"
+                  onsubmit="return confirm('Bu belgeyi silmek istediğinize emin misiniz?');">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <button type="submit" class="btn btn-sm btn-danger mr-1">
+                    <i class="fa-solid fa-trash-can mr-1"></i> Sil
+                </button>
+            </form>
+
+            <a href="@Url.Action("Edit", "Documents", new { id = Model.Id })"
+               class="btn btn-sm btn-primary mr-1">
+                <i class="fa-solid fa-pen-to-square mr-1"></i> Düzenle
+            </a>
+            <a href="@Url.Action("Index", "Documents")" class="btn btn-sm btn-secondary">
+                <i class="fa-solid fa-arrow-left mr-1"></i> Listeye Dön
+            </a>}
+        </div>
+    </div>
+}
+
+
+
+<div class="row">
+    <!-- Sol: Belge bilgileri -->
+    <div class="col-md-4">
+        <div class="dms-card">
+            <h5 class="mb-3">Belge Bilgileri</h5>
+
+            <dl class="row mb-0">
+                <dt class="col-5">Belge No</dt>
+                <dd class="col-7">@Model.Number</dd>
+
+                <dt class="col-5">Başlık</dt>
+                <dd class="col-7">@Model.Title</dd>
+
+                <dt class="col-5">Oluşturan</dt>
+                <dd class="col-7">@Model.CreatedBy</dd>
+
+                <dt class="col-5">Tarih</dt>
+                <dd class="col-7">@Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</dd>
+
+                <dt class="col-5">Durum</dt>
+                <dd class="col-7">@Model.Status</dd>
+
+                <dt class="col-5">Dosya</dt>
+                <dd class="col-7">
+                    @if (!string.IsNullOrEmpty(Model.OriginalFileName))
+                    {
+                        @Model.OriginalFileName
+                    }
+                    else
+                    {
+                        <span class="text-muted">Yok</span>
+                    }
+                </dd>
+                @if (!string.IsNullOrEmpty(Model.ExternalContent))
+                {
+                    <hr />
+                    <h5>API İçeriği</h5>
+                    <pre class="bg-light p-3 rounded small" style="white-space:pre-wrap;">
+    @Model.ExternalContent
+        </pre>
+                }
+
+                 @* Onay / Red bilgileri *@
+    @if (Model.Status == "Onaylandı" && !string.IsNullOrEmpty(Model.ApprovedBy))
+    {
+        <dt class="col-5">Onaylayan</dt>
+        <dd class="col-7">
+            @Model.ApprovedBy
+            @if (Model.ApprovedAt.HasValue)
+            {
+                <span class="text-muted">
+                    (@Model.ApprovedAt.Value.ToString("dd.MM.yyyy HH:mm"))
+                </span>
+            }
+        </dd>
+    }
+    else if (Model.Status == "Reddedildi" && !string.IsNullOrEmpty(Model.RejectedBy))
+    {
+        <dt class="col-5">Reddeden</dt>
+        <dd class="col-7">
+            @Model.RejectedBy
+            @if (Model.RejectedAt.HasValue)
+            {
+                <span class="text-muted">
+                    (@Model.RejectedAt.Value.ToString("dd.MM.yyyy HH:mm"))
+                </span>
+            }
+        </dd>
+
+        @if (!string.IsNullOrEmpty(Model.RejectionReason))
+        {
+            <dt class="col-5">Red Sebebi</dt>
+            <dd class="col-7">@Model.RejectionReason</dd>
+        }
+    }
+
+            <hr />
+
+            <div class="d-flex gap-2">
+    @if (!string.IsNullOrEmpty(Model.StoredFileName))
+    {
+        <a href="@Url.Action("Download", "Documents", new { id = Model.Id })"
+           class="btn btn-sm btn-outline-secondary mr-2">
+            <i class="fa-solid fa-download mr-1"></i> İndir
+        </a>
+
+        <a href="@Url.Action("Preview", "Documents", new { id = Model.Id })"
+           target="_blank"
+           class="btn btn-sm btn-outline-primary mr-2">
+            <i class="fa-solid fa-up-right-from-square mr-1"></i> Yeni Sekmede Aç
+        </a>
+    }
+
+    @* Sadece Taslak durumunda onaya gönder *@
+    @if (Model.Status == "Taslak")
+    {
+        <form asp-action="SendForApproval"
+              method="post"
+              class="d-inline"
+              onsubmit="return confirm('Bu belgeyi onaya göndermek istediğinize emin misiniz?');">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <button type="submit" class="btn btn-sm btn-success">
+                <i class="fa-solid fa-paper-plane mr-1"></i> Onaya Gönder
+            </button>
+        </form>
+    }
+</div>
+
+        </div>
+    </div>
+
+    <!-- Sağ: Ön izleme alanı -->
+    <div class="col-md-8">
+        <div class="dms-card">
+            <h5 class="mb-3">Belge Ön İzleme</h5>
+
+            @if (!string.IsNullOrEmpty(Model.StoredFileName))
+            {
+                <div style="height: 600px;">
+                    <iframe src="@Url.Action("Preview", "Documents", new { id = Model.Id })"
+                            style="width: 100%; height: 100%; border: 1px solid #ddd; border-radius: 8px;"
+                            title="Belge Ön İzleme">
+                    </iframe>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted mb-0">
+                    Bu belgeye ait dosya yüklenmemiş. Ön izleme gösterilemiyor.
+                </p>
+            }
+        </div>
+    </div>
+</div>

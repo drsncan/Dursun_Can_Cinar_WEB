@@ -1,0 +1,229 @@
+﻿@model DmsWeb.Models.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+    ViewBag.ActiveMenu = "Home";
+}
+
+@section PageHeader {
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1 class="page-title">
+                <i class="fa-solid fa-gauge-high mr-2"></i> Genel Bakış
+            </h1>
+            <div class="text-muted small">
+                Döküman Yönetim Sistemi için özet durum.
+            </div>
+        </div>
+        <div class="col-sm-6 text-right">
+            <span class="badge badge-light">
+                <i class="fa-regular fa-user mr-1"></i>@User.Identity?.Name
+            </span>
+        </div>
+    </div>
+}
+
+<div class="row">
+
+    <!-- Toplam Belge -->
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">Toplam Belge</div>
+                        <div class="h4 mb-0">@Model.TotalDocuments</div>
+                    </div>
+                    <div class="text-primary">
+                        <i class="fa-solid fa-folder-open fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Taslak -->
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">Taslak</div>
+                        <div class="h4 mb-0">@Model.DraftCount</div>
+                    </div>
+                    <div class="text-secondary">
+                        <i class="fa-regular fa-file-lines fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Onay Bekleyen -->
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">Onay Bekleyen</div>
+                        <div class="h4 mb-0">@Model.PendingCount</div>
+                    </div>
+                    <div class="text-warning">
+                        <i class="fa-solid fa-hourglass-half fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Onaylanan -->
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">Onaylanan</div>
+                        <div class="h4 mb-0 text-success">@Model.ApprovedCount</div>
+                    </div>
+                    <div class="text-success">
+                        <i class="fa-solid fa-circle-check fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row">
+
+    <!-- Son Belgeler -->
+    <div class="col-lg-7 mb-3">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fa-regular fa-clock mr-1"></i> Son Eklenen Belgeler
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm table-hover mb-0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th style="width: 120px;">Belge No</th>
+                            <th>Başlık</th>
+                            <th style="width: 130px;">Oluşturan</th>
+                            <th style="width: 110px;">Tarih</th>
+                            <th style="width: 90px;">Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.RecentDocuments != null && Model.RecentDocuments.Any())
+                        {
+                            foreach (var d in Model.RecentDocuments)
+                            {
+                                <tr>
+                                    <td>@d.Number</td>
+                                    <td>@d.Title</td>
+                                    <td>@d.CreatedBy</td>
+                                    <td>@d.CreatedAt.ToString("dd.MM.yyyy")</td>
+                                    <td>
+                                        @switch (d.Status)
+                                        {
+                                            case "Taslak":
+                                                @:<span class="badge badge-secondary">Taslak</span>
+                                                break;
+                                            case "Onay Bekliyor":
+                                                @:<span class="badge badge-warning">Onay Bekliyor</span>
+                                                break;
+                                            case "Onaylandı":
+                                                @:<span class="badge badge-success">Onaylandı</span>
+                                                break;
+                                            case "Reddedildi":
+                                                @:<span class="badge badge-danger">Reddedildi</span>
+                                                break;
+                                            default:
+                                                @:<span class="badge badge-light">@d.Status</span>
+                                                break;
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-muted text-center py-3">
+                                    Henüz belge eklenmemiş.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Onay Bekleyenler / Benim Belgelerim -->
+    <div class="col-lg-5 mb-3">
+        <div class="card shadow-sm border-0 mb-3">
+            <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fa-solid fa-user-check mr-1"></i> Benim Belgelerim
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-1 text-muted small">
+                    Bu kullanıcının oluşturduğu belge sayısı:
+                </p>
+                <div class="display-4">@Model.MyDocuments</div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fa-solid fa-list-check mr-1"></i> Onay Bekleyen Belgeler
+                </h5>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a href="@Url.Action("Index", "Approvals")" class="btn btn-sm btn-outline-primary">
+                        Tümünü Gör
+                    </a>
+                }
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Belge No</th>
+                            <th>Başlık</th>
+                            <th style="width: 110px;">Tarih</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.PendingDocuments != null && Model.PendingDocuments.Any())
+                        {
+                            foreach (var d in Model.PendingDocuments)
+                            {
+                                <tr>
+                                    <td>@d.Number</td>
+                                    <td>@d.Title</td>
+                                    <td>@d.CreatedAt.ToString("dd.MM.yyyy")</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="3" class="text-muted text-center py-3">
+                                    Onay bekleyen belge yok.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>

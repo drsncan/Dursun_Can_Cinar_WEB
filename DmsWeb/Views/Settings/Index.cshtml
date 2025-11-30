@@ -1,0 +1,143 @@
+﻿@model DmsWeb.Models.SystemSettingsViewModel
+
+@{
+    ViewData["Title"] = "Sistem Ayarları";
+    ViewBag.ActiveMenu = "Settings";
+}
+
+@section PageHeader {
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1 class="page-title">
+                <i class="fa-solid fa-gear mr-2"></i> Sistem Ayarları
+            </h1>
+        </div>
+        <div class="col-sm-6 text-right">
+            <span class="text-muted small">
+                @* buraya istersen versiyon vs. yazarsın *@
+                Yalnızca yöneticiler bu sayfayı görebilir.
+            </span>
+        </div>
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Kapat">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form asp-action="Index" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="form-group">
+                        <label asp-for="SystemName"></label>
+                        <input asp-for="SystemName" class="form-control" />
+                        <span asp-validation-for="SystemName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="InstitutionName"></label>
+                        <input asp-for="InstitutionName" class="form-control" />
+                        <span asp-validation-for="InstitutionName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Theme"></label>
+                        <select asp-for="Theme" class="form-control">
+                            <option value="light">Açık (Light)</option>
+                            <option value="dark">Koyu (Dark)</option>
+                        </select>
+                        <span asp-validation-for="Theme" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="LogoFile"></label>
+                        <div class="custom-file">
+                            <input asp-for="LogoFile" class="custom-file-input" />
+                            <label class="custom-file-label" for="LogoFile">Logo dosyası seç...</label>
+                        </div>
+                        <small class="form-text text-muted">
+                            (Opsiyonel) PNG / JPG logo yükleyebilirsin.
+                        </small>
+                        <span asp-validation-for="LogoFile" class="text-danger"></span>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.ExistingLogoPath))
+                    {
+                        <div class="form-group">
+                            <label>@Model.ExistingLogoPath</label>
+                            <div>
+                                <img src="@Model.ExistingLogoPath"
+                                     alt="Logo"
+                                     class="img-thumbnail"
+                                     style="max-height: 80px;" />
+                            </div>
+                        </div>
+                    }
+
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label asp-for="MaxUploadSizeMb"></label>
+                            <input asp-for="MaxUploadSizeMb" class="form-control" />
+                            <span asp-validation-for="MaxUploadSizeMb" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-8">
+                            <label asp-for="AllowedExtensions"></label>
+                            <input asp-for="AllowedExtensions" class="form-control" />
+                            <small class="form-text text-muted">
+                                Örn: <code>.pdf,.docx,.xlsx,.pptx</code>
+                            </small>
+                            <span asp-validation-for="AllowedExtensions" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa-solid fa-save mr-1"></i> Kaydet
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <i class="fa-solid fa-circle-info mr-1"></i> Bilgi
+            </div>
+            <div class="card-body text-sm">
+                <p class="mb-2">
+                    Bu alandan sistemin genel adı, kurum adı ve dosya yükleme limitlerini
+                    yönetebilirsin.
+                </p>
+                <ul class="mb-0">
+                    <li><strong>Tema</strong>: Şimdilik sadece light / dark string olarak tutuluyor.</li>
+                    <li><strong>Maks. boyut</strong>: Belgeler için MB cinsinden üst sınır.</li>
+                    <li><strong>Uzantılar</strong>: Virgül ile ayrılmış (nokta ile) dosya uzantıları.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Bootstrap custom file input label güncelleme
+        $(document).on('change', '.custom-file-input', function () {
+            var fileName = $(this).val().split('\\').pop();
+            $(this).siblings('.custom-file-label').addClass("selected").html(fileName);
+        });
+    </script>
+}

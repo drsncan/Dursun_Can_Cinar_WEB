@@ -1,0 +1,287 @@
+@model IEnumerable<DmsWeb.Models.Document>
+
+@{
+    ViewData["Title"] = "Belgeler";
+    ViewBag.ActiveMenu = "Documents";
+
+    var currentSearch = ViewBag.Search as string ?? "";
+    var currentStatus = ViewBag.Status as string ?? "Hepsi";
+    var currentSort = ViewBag.Sort as string ?? "date";
+    var currentOrder = ViewBag.Order as string ?? "desc";
+    var onlyMine = (bool?)ViewBag.OnlyMine ?? false;
+}
+
+@section PageHeader {
+    <div class="row mb-3 align-items-center">
+        <div class="col-12 col-md-6">
+            <h1 class="page-title mb-0">
+                <i class="fa-solid fa-folder-open mr-2"></i>
+                Belgeler
+                <small class="text-muted d-block d-sm-inline-block mt-1 mt-sm-0 ml-sm-2">
+                    Kurul kararları ve dokümanlar
+                </small>
+            </h1>
+        </div>
+
+        <div class="col-12 col-md-6 text-md-right mt-3 mt-md-0">
+            @if (User.IsInRole("Admin"))
+            {
+                <button id="btn-load-from-api" class="btn btn-outline-primary btn-sm mr-2 mb-1">
+                    <i class="fa-solid fa-rotate mr-1"></i> API'den Yükle
+                </button>
+            }
+
+            <a href="@Url.Action("Create", "Documents")"
+               class="btn btn-primary btn-sm mb-1">
+                <i class="fa-solid fa-plus mr-1"></i> Yeni Belge Ekle
+            </a>
+        </div>
+    </div>
+}
+
+<div class="card shadow-sm border-0 mb-3">
+    <div class="card-body py-3">
+        <form method="get" asp-action="Index" class="form-row">
+
+            <!-- mevcut sıralamayı koru -->
+            <input type="hidden" name="sort" value="@currentSort" />
+            <input type="hidden" name="order" value="@currentOrder" />
+
+            <!-- Arama -->
+            <div class="form-group col-12 col-md-4 mb-2">
+                <label class="mb-1 font-weight-semibold">Ara (Belge No / Başlık)</label>
+                <div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                    </div>
+                    <input type="text"
+                           name="search"
+                           class="form-control"
+                           value="@currentSearch"
+                           placeholder="Örn: DMS-2025 veya Satın Alma" />
+                </div>
+            </div>
+
+            <!-- Durum -->
+            <div class="form-group col-md-3 mb-2">
+                <label class="mb-1">Durum</label>
+                <select name="status" class="form-control form-control-sm">
+                    <option value="Hepsi" selected="@(currentStatus == "Hepsi")">Hepsi</option>
+                    <option value="Taslak" selected="@(currentStatus == "Taslak")">Taslak</option>
+                    <option value="Onay Bekliyor" selected="@(currentStatus == "Onay Bekliyor")">Onay Bekliyor</option>
+                    <option value="Onaylandı" selected="@(currentStatus == "Onaylandı")">Onaylandı</option>
+                    <option value="Reddedildi" selected="@(currentStatus == "Reddedildi")">Reddedildi</option>
+                </select>
+            </div>
+
+            <!-- Sadece benim belgelerim -->
+            <div class="form-group col-12 col-sm-6 col-md-3 mb-2 d-flex align-items-end">
+                <div class="custom-control custom-switch">
+                    <input class="custom-control-input"
+                           type="checkbox"
+                           id="onlyMine"
+                           name="onlyMine"
+                           value="true"
+                           @(onlyMine ? "checked" : "") />
+                    <label class="custom-control-label" for="onlyMine">
+                        Sadece benim belgelerim
+                    </label>
+                </div>
+            </div>
+
+            <!-- Butonlar -->
+            <div class="form-group col-12 col-md-2 mb-2 d-flex align-items-end justify-content-md-end">
+                <div class="btn-group btn-group-sm w-100 w-md-auto">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="fa-solid fa-filter mr-1"></i> Filtrele
+                    </button>
+                    <a href="@Url.Action("Index", "Documents")"
+                       class="btn btn-outline-secondary">
+                        Temizle
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-sm mb-0 align-middle" id="documents-table">
+                <thead class="thead-light">
+                    <tr>
+                        <th style="min-width: 110px;">
+                            <a asp-action="Index"
+                               asp-route-search="@currentSearch"
+                               asp-route-status="@currentStatus"
+                               asp-route-onlyMine="@(onlyMine ? "true" : "false")"
+                               asp-route-sort="number"
+                               asp-route-order="@(currentSort == "number" && currentOrder == "asc" ? "desc" : "asc")"
+                               class="text-decoration-none text-dark">
+                                Belge No
+                                @if (currentSort == "number")
+                                {
+                                    <span class="sort-indicator">@((currentOrder == "asc") ? "▲" : "▼")</span>
+                                }
+                            </a>
+                        </th>
+
+                        <th>
+                            <a asp-action="Index"
+                               asp-route-search="@currentSearch"
+                               asp-route-status="@currentStatus"
+                               asp-route-onlyMine="@(onlyMine ? "true" : "false")"
+                               asp-route-sort="title"
+                               asp-route-order="@(currentSort == "title" && currentOrder == "asc" ? "desc" : "asc")"
+                               class="text-decoration-none text-dark">
+                                Başlık
+                                @if (currentSort == "title")
+                                {
+                                    <span class="sort-indicator">@((currentOrder == "asc") ? "▲" : "▼")</span>
+                                }
+                            </a>
+                        </th>
+
+                        <th style="min-width: 120px;">
+                            <a asp-action="Index"
+                               asp-route-search="@currentSearch"
+                               asp-route-status="@currentStatus"
+                               asp-route-onlyMine="@(onlyMine ? "true" : "false")"
+                               asp-route-sort="createdby"
+                               asp-route-order="@(currentSort == "createdby" && currentOrder == "asc" ? "desc" : "asc")"
+                               class="text-decoration-none text-dark">
+                                Oluşturan
+                                @if (currentSort == "createdby")
+                                {
+                                    <span class="sort-indicator">@((currentOrder == "asc") ? "▲" : "▼")</span>
+                                }
+                            </a>
+                        </th>
+
+                        <th style="min-width: 110px;">
+                            <a asp-action="Index"
+                               asp-route-search="@currentSearch"
+                               asp-route-status="@currentStatus"
+                               asp-route-onlyMine="@(onlyMine ? "true" : "false")"
+                               asp-route-sort="date"
+                               asp-route-order="@(currentSort == "date" && currentOrder == "asc" ? "desc" : "asc")"
+                               class="text-decoration-none text-dark">
+                                Tarih
+                                @if (currentSort == "date")
+                                {
+                                    <span class="sort-indicator">@((currentOrder == "asc") ? "▲" : "▼")</span>
+                                }
+                            </a>
+                        </th>
+
+                        <th style="min-width: 120px;">
+                            <a asp-action="Index"
+                               asp-route-search="@currentSearch"
+                               asp-route-status="@currentStatus"
+                               asp-route-onlyMine="@(onlyMine ? "true" : "false")"
+                               asp-route-sort="status"
+                               asp-route-order="@(currentSort == "status" && currentOrder == "asc" ? "desc" : "asc")"
+                               class="text-decoration-none text-dark">
+                                Durum
+                                @if (currentSort == "status")
+                                {
+                                    <span class="sort-indicator">@((currentOrder == "asc") ? "▲" : "▼")</span>
+                                }
+                            </a>
+                        </th>
+
+                        <th style="min-width: 80px;">Dosya</th>
+                        <th style="width: 150px;">İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            <i class="fa-regular fa-circle-xmark mr-1"></i>
+                            Kriterlere uygun belge bulunamadı.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var doc in Model)
+                    {
+                        <tr>
+                            <td class="font-monospace">@doc.Number</td>
+                            <td>
+                                <span title="@doc.Title" class="d-inline-block text-truncate" style="max-width: 260px;">
+                                    @doc.Title
+                                </span>
+                            </td>
+                            <td>@doc.CreatedBy</td>
+                            <td>@doc.CreatedAt.ToString("dd.MM.yyyy")</td>
+                            <td>
+                                <span class="badge badge-pill dms-status-badge-@doc.Status.Replace(" ", "")">
+                                    @doc.Status
+                                </span>
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(doc.StoredFileName))
+                                {
+                                    <a href="@Url.Action("Download", "Documents", new { id = doc.Id })"
+                                       class="btn btn-xs btn-outline-secondary">
+                                        <i class="fa-solid fa-download mr-1"></i> İndir
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">Yok</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-xs">
+                                    <a href="@Url.Action("Details", "Documents", new { id = doc.Id })"
+                                       class="btn btn-xs btn-outline-primary">
+                                        <i class="fa-solid fa-eye mr-1"></i> Detay
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @if (User.IsInRole("Admin"))
+    {
+        <script>
+            document.getElementById("btn-load-from-api")
+                ?.addEventListener("click", function () {
+
+                    if (!confirm("Dış API'den yeni belgeler içeri aktarılacak. Onaylıyor musunuz?")) {
+                        return;
+                    }
+
+                    fetch("/api/ExternalDocuments/Import", {
+                        method: "POST"
+                    })
+                        .then(r => {
+                            if (!r.ok) throw new Error("HTTP " + r.status);
+                            return r.json();
+                        })
+                        .then(data => {
+                            alert(data.message);
+                            location.reload();
+                        })
+                        .catch(err => {
+                            console.error("API hata:", err);
+                            alert("API'den veri alınırken hata oluştu: " + err.message);
+                        });
+                });
+        </script>
+    }
+}
