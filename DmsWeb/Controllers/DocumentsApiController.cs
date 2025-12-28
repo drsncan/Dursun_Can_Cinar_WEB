@@ -21,6 +21,7 @@ namespace DmsWeb.Controllers
 
         // GET: /api/documents
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetAll()
         {
             var docs = _context.Documents
@@ -41,6 +42,8 @@ namespace DmsWeb.Controllers
 
         // GET: /api/documents/5
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult GetById(int id)
         {
             var d = _context.Documents
