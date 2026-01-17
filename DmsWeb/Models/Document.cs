@@ -1,5 +1,10 @@
+using System;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
+
 namespace DmsWeb.Models
 {
+    [Index(nameof(Number), IsUnique = true)]
     public class Document
     {
         public int Id { get; set; }

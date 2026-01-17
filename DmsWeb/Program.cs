@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
+// MVC + API (TEK SATIR YETERLİ)
 builder.Services.AddControllersWithViews(options =>
 {
     var policy = new AuthorizationPolicyBuilder()
@@ -16,10 +16,7 @@ builder.Services.AddControllersWithViews(options =>
     options.Filters.Add(new AuthorizeFilter(policy));
 });
 
-// ✅ Swagger'ın API controller'ları görmesi için:
-builder.Services.AddControllers();
-
-// ✅ Swagger servisleri
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -28,7 +25,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
-// Cookie Auth
+// Auth
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -40,14 +37,14 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// ✅ Swagger middleware (genelde dev'de açılır)
+// Swagger (dev)
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "DMS API v1");
-        c.RoutePrefix = "swagger"; // /swagger
+        c.RoutePrefix = "swagger";
     });
 }
 else
@@ -64,12 +61,12 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// MVC route
+// MVC (View'lar için ŞART)
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// ✅ API route (swagger buradan listeler)
+// API (attribute routing)
 app.MapControllers();
 
 app.Run();

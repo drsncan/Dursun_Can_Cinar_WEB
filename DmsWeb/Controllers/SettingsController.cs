@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace DmsWeb.Controllers
 {
     [Authorize(Roles = "Admin")]
+    [Route("[controller]/[action]")]
     public class SettingsController : Controller
     {
         private readonly AppDbContext _context;

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace DmsWeb.Controllers
 {
     [Authorize(Roles = "Admin")] // Bu controller'a sadece Admin rolü erişebilir
+    [Route("[controller]/[action]")]
     public class ApprovalsController : Controller
     {
         private readonly AppDbContext _context;

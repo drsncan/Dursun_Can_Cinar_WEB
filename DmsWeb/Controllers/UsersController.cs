@@ -9,6 +9,7 @@ using DmsWeb.Models;
 namespace DmsWeb.Controllers
 {
     [Authorize(Roles = "Admin")]
+    [Route("[controller]/[action]")]
     public class UsersController : Controller
     {
         private readonly AppDbContext _context;

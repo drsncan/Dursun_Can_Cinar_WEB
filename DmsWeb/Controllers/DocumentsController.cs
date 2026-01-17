@@ -8,6 +8,7 @@ using Microsoft.Net.Http.Headers;
 namespace DmsWeb.Controllers
 {
     [Authorize] // Bu controller'daki tüm yöntemler için login zorunlu
+    [Route("[controller]/[action]")]
     public class DocumentsController : Controller
     {
         private readonly AppDbContext _context;
@@ -115,6 +116,13 @@ namespace DmsWeb.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
+            // 🔴 AYNI BELGE NO KONTROLÜ (BURAYA EKLENECEK)
+            bool exists = _context.Documents.Any(d => d.Number == model.Number);
+            if (exists)
+            {
+                ModelState.AddModelError("Number", "Bu belge numarası zaten mevcut.");
+                return View(model);
+            }
             string storedFileName = "";
             string originalFileName = "";
 
@@ -133,6 +141,8 @@ namespace DmsWeb.Controllers
 
             // 🔴 ÖNEMLİ: Belgeyi oluşturanı login kullanıcıdan al
             var currentUserName = User.Identity?.Name ?? "Bilinmiyor";
+
+
 
             var doc = new Document
             {
@@ -345,5 +355,90 @@ namespace DmsWeb.Controllers
 
             return RedirectToAction(nameof(Details), new { id = id });
         }
+        
+        // GET: api/documents
+        [HttpGet]
+        [Produces("application/json")]
+        public IActionResult GetAll()
+        {
+            var docs = _context.Documents.ToList();
+            return Ok(docs);
+        }
+
+        // GET: api/documents/{id}
+        [HttpGet("{id}")]
+        [Produces("application/json")]
+        public IActionResult GetById(int id)
+        {
+            var doc = _context.Documents.FirstOrDefault(d => d.Id == id);
+            if (doc == null)
+                return NotFound();
+
+            return Ok(doc);
+        }
+
+        // POST: api/documents
+        [HttpPost]
+        [Produces("application/json")]
+        public IActionResult CreateApi([FromBody] DocumentCreateViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var currentUserName = User.Identity?.Name ?? "API";
+
+            var doc = new Document
+            {
+                Number = model.Number,
+                Title = model.Title,
+                CreatedBy = currentUserName,
+                CreatedAt = DateTime.Now,
+                Status = model.Status ?? "Taslak",
+                IsPublic = model.IsPublic
+            };
+
+            _context.Documents.Add(doc);
+            _context.SaveChanges();
+
+            return CreatedAtAction(nameof(GetById), new { id = doc.Id }, doc);
+        }
+
+        // PUT: api/documents/{id}
+        [HttpPut("{id}")]
+        [Produces("application/json")]
+        public IActionResult UpdateApi(int id, [FromBody] DocumentEditViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var doc = _context.Documents.FirstOrDefault(d => d.Id == id);
+            if (doc == null)
+                return NotFound();
+
+            doc.Number = model.Number;
+            doc.Title = model.Title;
+            doc.Status = model.Status;
+            doc.IsPublic = model.IsPublic;
+
+            _context.SaveChanges();
+
+            return NoContent();
+        }
+
+        // DELETE: api/documents/{id}
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("{id}")]
+        public IActionResult DeleteApi(int id)
+        {
+            var doc = _context.Documents.FirstOrDefault(d => d.Id == id);
+            if (doc == null)
+                return NotFound();
+
+            _context.Documents.Remove(doc);
+            _context.SaveChanges();
+
+            return NoContent();
+        }
+
     }
 }
