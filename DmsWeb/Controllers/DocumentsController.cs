@@ -9,6 +9,8 @@ namespace DmsWeb.Controllers
 {
     [Authorize] // Bu controller'daki tüm yöntemler için login zorunlu
     [Route("[controller]/[action]")]
+    [ApiExplorerSettings(IgnoreApi = true)]
+
     public class DocumentsController : Controller
     {
         private readonly AppDbContext _context;

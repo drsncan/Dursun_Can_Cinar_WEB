@@ -10,6 +10,8 @@ namespace DmsWeb.Controllers
 {
     [Authorize(Roles = "Admin")]
     [Route("[controller]/[action]")]
+    [ApiExplorerSettings(IgnoreApi = true)]
+
     public class UsersController : Controller
     {
         private readonly AppDbContext _context;

@@ -8,6 +8,8 @@ namespace DmsWeb.Controllers
 {
     [Authorize(Roles = "Admin")] // Bu controller'a sadece Admin rolü erişebilir
     [Route("[controller]/[action]")]
+    [ApiExplorerSettings(IgnoreApi = true)]
+
     public class ApprovalsController : Controller
     {
         private readonly AppDbContext _context;

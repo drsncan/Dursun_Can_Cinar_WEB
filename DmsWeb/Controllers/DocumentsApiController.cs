@@ -76,7 +76,11 @@ namespace DmsWeb.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult Create([FromBody] DocumentCreateViewModel model)
+
+
+        [Consumes("multipart/form-data")]
+        public IActionResult Create([FromForm] DocumentCreateViewModel model)
+
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

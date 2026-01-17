@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace DmsWeb.Controllers
 {
     [Authorize]
+    [ApiExplorerSettings(IgnoreApi = true)]
+
     public class HomeController : Controller
     {
         private readonly AppDbContext _context;
