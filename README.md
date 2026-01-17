@@ -109,9 +109,8 @@ Bu yapı sayesinde belge süreçleri, kullanıcı işlemleri ve onay mekanizmala
 
 ## 🎥 Proje Tanıtım Videosu
 
-📌 **Video Linki:** (Buraya eklenecek)
+📌 **Video Linki: https://youtu.be/IIHZu3TPz3w
 
-> Not: Video linki kullanıcı adı veya şifre gerektirmeden erişilebilir durumdadır.
 
 ---
 
